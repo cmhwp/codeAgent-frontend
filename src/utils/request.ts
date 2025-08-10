@@ -3,10 +3,11 @@ import axios, {
   type InternalAxiosRequestConfig,
   type AxiosResponse,
   type AxiosError,
+  type AxiosRequestConfig,
 } from 'axios'
 
 // 创建axios实例
-const request: AxiosInstance = axios.create({
+const axiosInstance: AxiosInstance = axios.create({
   baseURL: 'http://localhost:8123',
   timeout: 10000,
   headers: {
@@ -15,7 +16,7 @@ const request: AxiosInstance = axios.create({
 })
 
 // 请求拦截器
-request.interceptors.request.use(
+axiosInstance.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     // 从localStorage获取token
     const token = localStorage.getItem('token')
@@ -31,7 +32,7 @@ request.interceptors.request.use(
 )
 
 // 响应拦截器
-request.interceptors.response.use(
+axiosInstance.interceptors.response.use(
   (response: AxiosResponse) => {
     // 直接返回响应数据
     return response.data
@@ -74,5 +75,10 @@ request.interceptors.response.use(
     return Promise.reject(error)
   },
 )
+
+// 创建自定义的request函数，正确的类型定义
+const request = <T = any>(url: string, config?: AxiosRequestConfig): Promise<T> => {
+  return axiosInstance(url, config)
+}
 
 export default request
